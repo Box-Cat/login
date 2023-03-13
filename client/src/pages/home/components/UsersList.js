@@ -63,7 +63,7 @@ const UsersList = ({ searchKey }) => {
       const lastMsgPerson = chat?.lastMessage?.sender === user._id ? "You : " : "";
       return (
         <div className='flex justify-between w-full'>
-          <h1 className='text-gray-600 text-sm'> ${lastMsgPerson} ${chat.lastMessage?.text} </h1>
+          <h1 className='text-gray-600 text-sm'> {lastMsgPerson} {chat?.lastMessage?.text} </h1>
           <h1 className='text-gray-500 text-sm'>
             {moment(chat?.lastMessage.createdAt).format("hh:mm:A")}
           </h1>
