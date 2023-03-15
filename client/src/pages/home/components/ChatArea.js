@@ -1,16 +1,17 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { SendMessage } from './../../../apicalls/message';
+import { GetMessages,SendMessage } from './../../../apicalls/message';
+import { ClearChatMessages } from "../../../apicalls/chats";
 import { HideLoader, ShowLoader } from '../../../redux/loaderSlice';
 import { toast } from 'react-hot-toast';
-import { GetMessages } from '../../../apicalls/message'
 import moment from "moment";
+import { SetAllChats } from '../../../redux/userSlice';
 
 const ChatArea = () => {
   const dispatch = useDispatch();
   const [newMessage, setNewMessage] = useState('');
-  const { selectedChat, user } = useSelector(state => state.userReducer);
+  const { selectedChat, user, allChats } = useSelector(state => state.userReducer);
   const [messages = [], setMessages] = useState([]);
   const receipentUser = selectedChat.members.find(
     (mem) => mem._id !== user._id
@@ -49,8 +50,31 @@ const ChatArea = () => {
     }
   }
 
+  const clearUnreadMessages = async () => {
+    try {
+     dispatch(ShowLoader());
+     const response = await ClearChatMessages(selectedChat._id);
+     dispatch(HideLoader());
+     if(response.success){
+      const updatedChats = allChats.map((chat)=>{
+        if(chat._id === selectedChat._id){
+          return response.data;
+        }
+        return chat;
+      });
+      dispatch(SetAllChats(updatedChats));
+     }
+    } catch (error) {
+      dispatch(HideLoader());
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     getMessages();
+    if(selectedChat?.lastMessage?.sender !== user._id){
+      clearUnreadMessages();
+    }
   }, [selectedChat])
 
   return (
@@ -79,7 +103,7 @@ const ChatArea = () => {
         <div className='flex flex-col gap-2'>
           {messages.map((message) => {
             const isCurrentUserIsSender = message.sender === user._id;
-            return <div className={`flex ${isCurrentUserIsSender && `justify-end `}`}>
+            return (<div className={`flex ${isCurrentUserIsSender && `justify-end `}`}>
               <div className='flex flex-col gap-1'>
                 <h1
                   className={
@@ -90,7 +114,13 @@ const ChatArea = () => {
                 >{message.text}</h1>
                 <h1 className='text-gray-500 text-sm'>{moment(message.createdAt).format('hh:mm A')}</h1>
               </div>
+              {isCurrentUserIsSender && ( 
+                <i className={`ri-check-double-line text-lg p-1
+                  ${message.read ? "text-green-700" : "text-gray-400"}
+                `}></i>
+              )} 
             </div>
+            );
           })}
         </div>
       </div>

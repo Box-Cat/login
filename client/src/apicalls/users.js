@@ -12,10 +12,8 @@ export const LoginUser = async(user) => {
 export const RegisterUser = async (user) => {
     try{
         const response = await axiosInstance.post('/api/users/register',user);
-        console.log("respone",response)
         return response.data;
     }catch(error){
-        console.log("error",error)
         return error.response.data;
     }
 }

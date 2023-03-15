@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema(
   {
@@ -6,22 +6,23 @@ const chatSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'users'
+          ref: "users",
         },
-      ]
+      ],
     },
     lastMessage: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'message',
+      ref: "messages",
     },
-    unreadMessage: {
+    unreadMessages: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("chats",chatSchema);
+
+module.exports = mongoose.model("chats", chatSchema);
