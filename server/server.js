@@ -21,7 +21,11 @@ const io = require("socket.io")(server, {
 // check the connection of socket from client
 io.on("connection",(socket)=>{
   //socket events will be here
-  console.log("connected with socketid",socket.id);
+
+  socket.on("send-new-message-to-all",(data)=>{
+    //send to all the clients
+    socket.emit("new-message-from-server",data);
+  })
 });
 
 app.use("/api/users", usersRoute);
